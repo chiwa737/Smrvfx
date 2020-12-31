@@ -3009,8 +3009,6 @@ public class KinectManager : MonoBehaviour
 				sensorData.colorImageTexture2D.Apply();
 			}
 		}
-
-		//usersClrTex.Apply();
 	}
 	
 	// Update the user histogram
@@ -3293,63 +3291,26 @@ public class KinectManager : MonoBehaviour
 				// get the body position
 				Vector3 bodyPos = bodyData.position;
 
-//				if(liPrimaryUserId == 0)
-//				{
-//					// check if this is the closest user
-//					bool bClosestUser = true;
-//					int iClosestUserIndex = i;
-//					
-//					if(detectClosestUser)
-//					{
-//						for(int j = 0; j < sensorData.bodyCount; j++)
-//						{
-//							if(j != i)
-//							{
-//								KinectInterop.BodyData bodyDataOther = bodyFrame.bodyData[j];
-//								
-//								if((bodyDataOther.bIsTracked != 0) && 
-//									(Mathf.Abs(bodyDataOther.position.z) < Mathf.Abs(bodyPos.z)))
-//								{
-//									bClosestUser = false;
-//									iClosestUserIndex = j;
-//									break;
-//								}
-//							}
-//						}
-//					}
-//					
-//					if(bClosestUser)
-//					{
-//						// add the first or closest userId to the list of new users
-//						if(!addedUsers.Contains(userId))
-//						{
-//							addedUsers.Insert(0, userId);
-//							addedIndexes.Insert(0, iClosestUserIndex);
-//							trackedUsers++;
-//						}
-//					}
-//				}
-				
 				// add userId to the list of new users
-				if(!addedUsers.Contains(userId))
-				{
+				if (!addedUsers.Contains(userId)) {
 					addedUsers.Add(userId);
 					addedIndexes.Add(i);
-					//trackedUsers++;
+
+					for (int controllerIndx = 0; controllerIndx < avatarControllers.Count; controllerIndx++) {
+						AvatarController avatar = avatarControllers[controllerIndx];
+                        //if (avatar && avatar.TimelinePlayer && GetUserIdByIndex(avatar.playerIndex) == userId)
+                            //avatar.SendMessage("EnableTimeline", false);
+                    }
+
 				}
 
 				// convert Kinect positions to world positions
 				bodyFrame.bodyData[i].position = bodyPos;
-				//string debugText = String.Empty;
 
 				// process special cases
 				ProcessBodySpecialData(ref bodyData);
 				ProcessBodySpecialDirs(ref bodyData);
 
-////// 		turnaround mode start
-				// determine if the user is turned around
-				//float bodyTurnAngle = 0f;
-				//float neckTiltAngle = 0f;
 
 				if(allowTurnArounds)
 				{
@@ -3430,14 +3391,7 @@ public class KinectManager : MonoBehaviour
 						ProcessBodySpecialDirs(ref bodyData);
 					}
 				}
-				
-//				if(allowTurnArounds && calibrationText)
-//				{
-//					calibrationText.text = string.Format("{0} - BodyAngle: {1:000}", 
-//					    (!bodyData.isTurnedAround ? "FACE" : "BACK"), bodyData.bodyTurnAngle);
-//				}
-
-////// 		turnaround mode end
+			
 
 				// calculate world orientations of the body joints
 				CalculateJointOrients(ref bodyData);
@@ -4840,8 +4794,6 @@ public class KinectManager : MonoBehaviour
 
 		foreach(MonoBehaviour monoScript in monoScripts)
 		{
-//			if(typeof(KinectGestures.GestureListenerInterface).IsAssignableFrom(monoScript.GetType()) &&
-//				monoScript.enabled)
 			if((monoScript is KinectGestures.GestureListenerInterface) && monoScript.enabled)
 			{
 				//KinectGestures.GestureListenerInterface gl = (KinectGestures.GestureListenerInterface)monoScript;
@@ -4853,21 +4805,8 @@ public class KinectManager : MonoBehaviour
 		gestureManager = null;
 		foreach(MonoBehaviour monoScript in monoScripts)
 		{
-//			if(typeof(KinectGestures).IsAssignableFrom(monoScript.GetType()) && 
-//				monoScript.enabled)
 			if((monoScript is KinectGestures) && monoScript.enabled)
 			{
-//#if !UNITY_2019
-//                // if skipRemoteAvatars - add only the local gesture managers
-//                if ( skipRemoteAvatars && monoScript is NetworkBehaviour )
-//                {
-//                    if( false == ( monoScript as NetworkBehaviour ).isLocalPlayer )
-//                    {
-//						Debug.Log( "KM: KinectGestures not registered because is not a local object!" );
-//                        continue;   // skip network objects from other clients -> they are controlled by the KM on other machine
-//                    }
-//                }
-//#endif
                 gestureManager = (KinectGestures)monoScript;
 				break;
 			}
@@ -4888,7 +4827,6 @@ public class KinectManager : MonoBehaviour
 	{
 		// remove all users, filters and avatar controllers
 		avatarControllers.Clear();
-		//ClearKinectUsers();
 
 		// get the mono scripts. avatar controllers and gesture listeners are among them
 		MonoBehaviour[] monoScripts = FindObjectsOfType(typeof(MonoBehaviour)) as MonoBehaviour[];
@@ -4896,21 +4834,7 @@ public class KinectManager : MonoBehaviour
 		// locate the available avatar controllers
 		foreach(MonoBehaviour monoScript in monoScripts)
 		{
-//			if(typeof(AvatarController).IsAssignableFrom(monoScript.GetType()) &&
-//				monoScript.enabled)
-			if((monoScript is AvatarController) && monoScript.enabled)
-			{
-//#if !UNITY_2019
-//                // if skipRemoteAvatars - add only the local avatar controllers
-//                if ( skipRemoteAvatars && monoScript is NetworkBehaviour )
-//                {
-//                    if( false == ( monoScript as NetworkBehaviour ).isLocalPlayer )
-//                    {
-//                        Debug.Log( "KM: AvatarController not registered because is not a local object!" );
-//                        continue;   // skip network objects from other clients -> there are controlled by kinect in other computer 
-//                    }
-//                }
-//#endif
+			if((monoScript is AvatarController) && monoScript.enabled) {
                 AvatarController avatar = (AvatarController)monoScript;
 				avatarControllers.Add(avatar);
 			}

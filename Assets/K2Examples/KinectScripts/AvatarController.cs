@@ -6,7 +6,8 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using System.IO;
-using System.Text; 
+using System.Text;
+using UnityEngine.Playables;
 
 
 /// <summary>
@@ -14,7 +15,8 @@ using System.Text;
 /// </summary>
 [RequireComponent(typeof(Animator))]
 public class AvatarController : MonoBehaviour
-{	
+{
+	public PlayableDirector TimelinePlayer;
 	[Tooltip("Index of the player, tracked by this component. 0 means the 1st player, 1 - the 2nd one, 2 - the 3rd one, etc.")]
 	public int playerIndex = 0;
 	
@@ -148,6 +150,13 @@ public class AvatarController : MonoBehaviour
 	// background plane rectangle
 	private Rect planeRect = new Rect();
 	private bool planeRectSet = false;
+
+
+
+	public void EnableTimeline(bool enabled) {
+		TimelinePlayer.enabled = enabled;
+		TimelinePlayer.Stop();
+	}
 
 
 	/// <summary>
@@ -486,7 +495,7 @@ public class AvatarController : MonoBehaviour
 		}
 		
 		// move the avatar to its Kinect position
-		if(!externalRootMotion)
+		if(!externalRootMotion) // TODO: check its usage
 		{
 			MoveAvatar(UserID);
 		}
