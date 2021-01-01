@@ -8,7 +8,7 @@ using System.Runtime.InteropServices;
 using System.IO;
 using System.Text;
 using UnityEngine.Playables;
-
+using UnityEngine.VFX;
 
 /// <summary>
 /// Avatar controller is the component that transfers the captured user motion to a humanoid model (avatar).
@@ -16,7 +16,8 @@ using UnityEngine.Playables;
 [RequireComponent(typeof(Animator))]
 public class AvatarController : MonoBehaviour
 {
-	public PlayableDirector TimelinePlayer;
+	public GameObject VFX;
+	public GameObject animaVFX;
 	[Tooltip("Index of the player, tracked by this component. 0 means the 1st player, 1 - the 2nd one, 2 - the 3rd one, etc.")]
 	public int playerIndex = 0;
 	
@@ -153,10 +154,10 @@ public class AvatarController : MonoBehaviour
 
 
 
-	public void EnableTimeline(bool enabled) {
-		TimelinePlayer.enabled = enabled;
-		TimelinePlayer.Stop();
-	}
+	public void OnKinectStart(bool enabled) {
+        VFX.SetActive(enabled);
+        animaVFX.SetActive(!enabled);
+    }
 
 
 	/// <summary>
@@ -356,21 +357,24 @@ public class AvatarController : MonoBehaviour
 		}
 	}
 
-
-	public void Awake()
+	public void Start() {
+		     
+		OnKinectStart(false);
+    }
+	public void Awake() 
     {	
 		// check for double start
-		if(bones != null)
+		if(bones != null && bones.Length > 2)  
 			return;
 		if(!gameObject.activeInHierarchy) 
 			return;
 
 		// inits the bones array
-		bones = new Transform[31];
-		
+		bones = new Transform[31]; 
+		 
 		// get the animator reference
-		animatorComponent = GetComponent<Animator>();
-
+		animatorComponent = GetComponent<Animator>(); 
+		 
 		// Map bones to the points the Kinect tracks
 		MapBones();
 
@@ -1103,7 +1107,7 @@ public class AvatarController : MonoBehaviour
 	// Set model's arms to be in T-pose
 	protected void SetModelArmsInTpose()
 	{
-		Vector3 vTposeLeftDir = transform.TransformDirection(Vector3.left);
+		Vector3 vTposeLeftDir = transform.TransformDirection(Vector3.left);  
 		Vector3 vTposeRightDir = transform.TransformDirection(Vector3.right);
 
 		Transform transLeftUarm = GetBoneTransform(GetBoneIndexByJoint(KinectInterop.JointType.ShoulderLeft, false)); // animator.GetBoneTransform(HumanBodyBones.LeftUpperArm);

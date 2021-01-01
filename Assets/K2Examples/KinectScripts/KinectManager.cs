@@ -3298,8 +3298,8 @@ public class KinectManager : MonoBehaviour
 
 					for (int controllerIndx = 0; controllerIndx < avatarControllers.Count; controllerIndx++) {
 						AvatarController avatar = avatarControllers[controllerIndx];
-                        //if (avatar && avatar.TimelinePlayer && GetUserIdByIndex(avatar.playerIndex) == userId)
-                            //avatar.SendMessage("EnableTimeline", false);
+                        if (avatar && GetUserIdByIndex(avatar.playerIndex) == userId)
+                            avatar.SendMessage("OnKinectStart", true);
                     }
 
 				}
@@ -3996,21 +3996,27 @@ public class KinectManager : MonoBehaviour
 		int uidIndex = Array.IndexOf(aUserIndexIds, userId);
 		Debug.Log("Removing user " + uidIndex + ", ID: " + userId + ", Body: " + dictUserIdToIndex[userId] + ", Time: " + Time.realtimeSinceStartup);
 
-//		// reset the respective avatar controllers
-//		for(int i = 0; i < avatarControllers.Count; i++)
-//		{
-//			AvatarController avatar = avatarControllers[i];
-//
-//			//if(avatar && avatar.playerIndex >= uidIndex && avatar.playerIndex < alUserIds.Count)
-//			if(avatar && avatar.playerId == userId)
-//			{
-//				avatar.ResetToInitialPosition();
-//				avatar.playerId = 0;
-//			}
-//		}
+		for (int controllerIndx = 0; controllerIndx < avatarControllers.Count; controllerIndx++) {
+			AvatarController avatar = avatarControllers[controllerIndx];
+			if (avatar && GetUserIdByIndex(avatar.playerIndex) == userId)
+				avatar.SendMessage("OnKinectStart", false);
+		}
+
+		//		// reset the respective avatar controllers
+		//		for(int i = 0; i < avatarControllers.Count; i++)
+		//		{
+		//			AvatarController avatar = avatarControllers[i];
+		//
+		//			//if(avatar && avatar.playerIndex >= uidIndex && avatar.playerIndex < alUserIds.Count)
+		//			if(avatar && avatar.playerId == userId)
+		//			{
+		//				avatar.ResetToInitialPosition();
+		//				avatar.playerId = 0;
+		//			}
+		//		}
 
 		// notify all gesture listeners for losing this user
-		foreach(KinectGestures.GestureListenerInterface listener in gestureListeners)
+		foreach (KinectGestures.GestureListenerInterface listener in gestureListeners)
 		{
 			if(listener != null)
 			{
