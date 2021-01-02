@@ -1799,6 +1799,7 @@ public class KinectManager : MonoBehaviour
 		{
 			Int64 userId = alUserIds[i];
 			RemoveUser(userId);
+			InformAvatarLost(userId);
 		}
 		
 		ResetFilters();
@@ -3240,7 +3241,15 @@ public class KinectManager : MonoBehaviour
 		}
 		
 	}
-	
+
+
+	private void InformAvatarLost(long userId) {
+		for (int controllerIndx = 0; controllerIndx < avatarControllers.Count; controllerIndx++) {
+			AvatarController avatar = avatarControllers[controllerIndx];
+			if (avatar && GetUserIdByIndex(avatar.playerIndex) == userId)
+				avatar.SendMessage("OnKinectStart", false);
+		}
+	}
 	// Processes body frame data
 	private void ProcessBodyFrameData()
 	{
@@ -3293,15 +3302,17 @@ public class KinectManager : MonoBehaviour
 
 				// add userId to the list of new users
 				if (!addedUsers.Contains(userId)) {
-					addedUsers.Add(userId);
-					addedIndexes.Add(i);
+					
 
 					for (int controllerIndx = 0; controllerIndx < avatarControllers.Count; controllerIndx++) {
 						AvatarController avatar = avatarControllers[controllerIndx];
-                        if (avatar && GetUserIdByIndex(avatar.playerIndex) == userId)
-                            avatar.SendMessage("OnKinectStart", true);
-                    }
-
+                        if (avatar && GetUserIdByIndex(avatar.playerIndex) == userId) {
+							RemoveUser(userId);
+							avatar.SendMessage("OnKinectStart", true);
+						}
+					}
+					addedUsers.Add(userId); 
+					addedIndexes.Add(i);
 				}
 
 				// convert Kinect positions to world positions
@@ -3428,6 +3439,7 @@ public class KinectManager : MonoBehaviour
 				if((Time.time - dictUserIdToTime[userId]) > waitTimeBeforeRemove)
 				{
 					RemoveUser(userId);
+					InformAvatarLost(userId);
 				}
 			}
 			
@@ -3996,11 +4008,7 @@ public class KinectManager : MonoBehaviour
 		int uidIndex = Array.IndexOf(aUserIndexIds, userId);
 		Debug.Log("Removing user " + uidIndex + ", ID: " + userId + ", Body: " + dictUserIdToIndex[userId] + ", Time: " + Time.realtimeSinceStartup);
 
-		for (int controllerIndx = 0; controllerIndx < avatarControllers.Count; controllerIndx++) {
-			AvatarController avatar = avatarControllers[controllerIndx];
-			if (avatar && GetUserIdByIndex(avatar.playerIndex) == userId)
-				avatar.SendMessage("OnKinectStart", false);
-		}
+		
 
 		//		// reset the respective avatar controllers
 		//		for(int i = 0; i < avatarControllers.Count; i++)

@@ -16,8 +16,8 @@ using UnityEngine.VFX;
 [RequireComponent(typeof(Animator))]
 public class AvatarController : MonoBehaviour
 {
-	public GameObject VFX;
-	public GameObject animaVFX;
+	public GameObject animatorTimeLine;
+
 	[Tooltip("Index of the player, tracked by this component. 0 means the 1st player, 1 - the 2nd one, 2 - the 3rd one, etc.")]
 	public int playerIndex = 0;
 	
@@ -155,9 +155,9 @@ public class AvatarController : MonoBehaviour
 
 
 	public void OnKinectStart(bool enabled) {
-        VFX.SetActive(enabled);
-        animaVFX.SetActive(!enabled);
-    }
+		animatorTimeLine.SetActive(!enabled);
+		
+	}
 
 
 	/// <summary>
@@ -359,7 +359,7 @@ public class AvatarController : MonoBehaviour
 
 	public void Start() {
 		     
-		OnKinectStart(false);
+		OnKinectStart(false); 
     }
 	public void Awake() 
     {	
